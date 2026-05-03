@@ -1,7 +1,227 @@
-<iframe 
-  src="https://mgould1766-oss.github.io/Outbound-Journey/?v=3"
-  width="100%" 
-  height="1200" 
-  style="border:0;border-radius:24px;overflow:hidden;"
-  loading="lazy">
-</iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outbound Journey | The Grand Adventure</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      color: #2F3A4A;
+      background: linear-gradient(180deg, #EAF4FB 0%, #F7DDE2 58%, #FFFFFF 100%);
+    }
+
+    .route-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 38px;
+    }
+
+    .hero {
+      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(146,161,195,0.22);
+      border-radius: 30px;
+      box-shadow: 0 14px 34px rgba(47,58,74,0.10);
+      padding: 38px 26px 30px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #FFFFFF;
+      color: #6F87B7;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+      box-shadow: 0 5px 14px rgba(146,161,195,0.15);
+    }
+
+    h1 {
+      font-family: 'Quicksand', sans-serif;
+      font-size: clamp(38px, 6vw, 64px);
+      line-height: 1.02;
+      margin: 0;
+      color: #2F3A4A;
+    }
+
+    .subtitle {
+      max-width: 800px;
+      margin: 18px auto 0;
+      font-size: 18px;
+      line-height: 1.65;
+      color: #526070;
+    }
+
+    .route-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 24px auto 26px;
+    }
+
+    .pill {
+      background: #FFFFFF;
+      border: 1px solid rgba(146,161,195,0.22);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #46546A;
+      box-shadow: 0 5px 12px rgba(146,161,195,0.10);
+    }
+
+    .map-card {
+      margin-top: 18px;
+      background: #FFFFFF;
+      border-radius: 26px;
+      padding: 14px;
+      box-shadow: 0 12px 28px rgba(47,58,74,0.10);
+      border: 1px solid rgba(146,161,195,0.18);
+    }
+
+    #map {
+      width: 100%;
+      height: 430px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .map-note {
+      margin: 14px auto 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #687587;
+      max-width: 760px;
+    }
+
+    .leaflet-popup-content {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 13px;
+      color: #2F3A4A;
+    }
+
+    @media (max-width: 700px) {
+      .route-wrap {
+        padding: 20px 12px 26px;
+      }
+
+      .hero {
+        padding: 28px 18px 24px;
+        border-radius: 24px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      #map {
+        height: 360px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="route-wrap">
+    <section class="hero">
+      <div class="eyebrow">Route 66 Centennial · Outbound Journey</div>
+
+      <h1>Westbound to the Mother Road</h1>
+
+      <p class="subtitle">
+        From North Carolina to Chicago, then across Route 66 toward California — a family road trip built for discovery,
+        roadside surprises, quirky stops, and memories the kids can help collect along the way.
+      </p>
+
+      <div class="route-pills">
+        <div class="pill">12 Travel Days</div>
+        <div class="pill">Goldsboro to Buena Park</div>
+        <div class="pill">Chicago Start</div>
+        <div class="pill">Route 66 Icons</div>
+        <div class="pill">Kid-Friendly Pace</div>
+      </div>
+
+      <div class="map-card">
+        <div id="map"></div>
+      </div>
+
+      <p class="map-note">
+        Map is a planning view of the outbound route, highlighting the overnight stops and major Route 66 direction of travel.
+      </p>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    const stops = [
+      { name: "Goldsboro, NC", note: "The adventure begins.", lat: 35.3849, lng: -77.9928 },
+      { name: "Lewisburg, WV", note: "First overnight stop.", lat: 37.8018, lng: -80.4456 },
+      { name: "Tipp City, OH", note: "Positioning day toward Chicago.", lat: 39.9584, lng: -84.1722 },
+      { name: "Oak Lawn / Chicago Area, IL", note: "Set up for the start of Route 66.", lat: 41.7199, lng: -87.7479 },
+      { name: "Springfield, IL", note: "Classic Illinois Route 66 stop.", lat: 39.7817, lng: -89.6501 },
+      { name: "Rolla, MO", note: "Missouri Route 66 overnight.", lat: 37.9514, lng: -91.7713 },
+      { name: "Tulsa, OK", note: "Oklahoma Route 66 energy.", lat: 36.1540, lng: -95.9928 },
+      { name: "Amarillo, TX", note: "Cadillac Ranch and Texas fun.", lat: 35.2220, lng: -101.8313 },
+      { name: "Albuquerque, NM", note: "New Mexico color and history.", lat: 35.0844, lng: -106.6504 },
+      { name: "Holbrook, AZ", note: "Wigwam Motel special stop.", lat: 34.9022, lng: -110.1582 },
+      { name: "Williams, AZ", note: "Grand Canyon gateway.", lat: 35.2495, lng: -112.1910 },
+      { name: "Needles, CA", note: "Desert stretch near the end.", lat: 34.8481, lng: -114.6141 },
+      { name: "Buena Park, CA", note: "Final outbound arrival.", lat: 33.8675, lng: -117.9981 }
+    ];
+
+    const map = L.map('map', {
+      scrollWheelZoom: false,
+      dragging: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const routeLine = stops.map(stop => [stop.lat, stop.lng]);
+
+    L.polyline(routeLine, {
+      color: '#92A1C3',
+      weight: 5,
+      opacity: 0.85,
+      smoothFactor: 1
+    }).addTo(map);
+
+    stops.forEach((stop, index) => {
+      const marker = L.circleMarker([stop.lat, stop.lng], {
+        radius: index === 0 || index === stops.length - 1 ? 8 : 6,
+        color: '#6F87B7',
+        weight: 2,
+        fillColor: index === 0 ? '#7BDFF2' : index === stops.length - 1 ? '#FFD166' : '#F7DDE2',
+        fillOpacity: 0.95
+      }).addTo(map);
+
+      marker.bindPopup(`<strong>${index + 1}. ${stop.name}</strong><br>${stop.note}`);
+    });
+
+    map.fitBounds(routeLine, {
+      padding: [28, 28]
+    });
+  </script>
+</body>
+</html>
